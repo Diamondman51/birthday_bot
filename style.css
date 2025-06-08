@@ -1,0 +1,570 @@
+/* style.css */
+
+/* --- Google Fonts Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@300;400;600;700&display=swap');
+
+/* --- CSS Reset / Box Sizing --- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* Colors */
+    --primary-blue: #2c3e50;
+    /* Dark Blue */
+    --secondary-blue: #34495e;
+    /* Slightly lighter dark blue */
+    --accent-gold: #c09f77;
+    /* Muted Gold/Bronze */
+    --text-dark: #333;
+    --text-light: #f4f4f4;
+    --background-light: #fdfdfd;
+    --border-light: #e0e0e0;
+    --hover-light: #f0f0f0;
+
+    /* Fonts */
+    --font-heading: 'Merriweather', serif;
+    --font-body: 'Open Sans', sans-serif;
+
+    /* Spacing */
+    --spacing-xs: 8px;
+    --spacing-sm: 16px;
+    --spacing-md: 24px;
+    --spacing-lg: 48px;
+}
+
+body {
+    font-family: var(--font-body);
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--background-light);
+    margin: 0;
+    padding-top: 70px;
+    /* Space for fixed header */
+}
+
+/* --- Container for Page Content --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+/* --- Header --- */
+.header {
+    background-color: var(--primary-blue);
+    color: var(--text-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header .logo {
+    font-family: var(--font-heading);
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.header .logo span {
+    color: var(--text-light);
+    font-size: 0.8em;
+}
+
+.header .nav-menu {
+    list-style: none;
+    display: flex;
+}
+
+.header .nav-menu li {
+    margin-left: var(--spacing-md);
+}
+
+.header .nav-menu a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 400;
+    transition: color 0.3s ease;
+    padding: 5px 0;
+}
+
+.header .nav-menu a:hover,
+.header .nav-menu a.active {
+    color: var(--accent-gold);
+}
+
+/* --- Page Headings --- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    margin-bottom: var(--spacing-sm);
+    color: var(--secondary-blue);
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: var(--spacing-md);
+}
+
+h2 {
+    font-size: 2em;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+/* --- Buttons & Forms --- */
+.button {
+    display: inline-block;
+    background-color: var(--accent-gold);
+    color: var(--text-light);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #a0815a;
+    /* Darker gold */
+}
+
+.search-bar {
+    display: flex;
+    margin-bottom: var(--spacing-md);
+}
+
+.search-bar input[type="text"] {
+    flex-grow: 1;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-light);
+    border-radius: 5px 0 0 5px;
+    font-size: 1em;
+    outline: none;
+}
+
+.search-bar button {
+    background-color: var(--secondary-blue);
+    color: var(--text-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--secondary-blue);
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1em;
+}
+
+.search-bar button:hover {
+    background-color: var(--primary-blue);
+}
+
+/* --- Cards / Sections --- */
+.card {
+    background-color: #fff;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card h2,
+.card h3 {
+    margin-top: 0;
+    color: var(--primary-blue);
+}
+
+/* --- List Styles (for terms lists) --- */
+.term-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    /* Responsive grid */
+    gap: var(--spacing-sm);
+}
+
+.term-list li a {
+    display: block;
+    padding: var(--spacing-xs);
+    background-color: #fff;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.term-list li a:hover {
+    background-color: var(--hover-light);
+    border-color: var(--secondary-blue);
+    color: var(--secondary-blue);
+}
+
+/* --- Alphabetical Navigation --- */
+.alpha-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-md);
+    background-color: #f8f8f8;
+    padding: var(--spacing-sm);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.alpha-nav a {
+    display: block;
+    padding: 5px 10px;
+    margin: 3px;
+    text-decoration: none;
+    color: var(--secondary-blue);
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.alpha-nav a:hover,
+.alpha-nav a.active {
+    background-color: var(--secondary-blue);
+    color: var(--text-light);
+}
+
+/* --- Footer --- */
+.footer {
+    background-color: var(--secondary-blue);
+    color: var(--text-light);
+    text-align: center;
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    font-size: 0.9em;
+}
+
+.footer .footer-links {
+    list-style: none;
+    margin-bottom: var(--spacing-xs);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.footer .footer-links li {
+    margin: 0 var(--spacing-xs);
+}
+
+.footer .footer-links a {
+    color: var(--accent-gold);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer .footer-links a:hover {
+    color: var(--text-light);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-bottom: var(--spacing-xs);
+    }
+
+    .header .nav-menu {
+        margin-top: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+
+    .header .nav-menu li {
+        margin-left: 0;
+        margin-right: var(--spacing-sm);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .container {
+        padding: var(--spacing-sm);
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.6em;
+    }
+
+    .term-list {
+        grid-template-columns: 1fr;
+        /* Stack columns on smaller screens */
+    }
+
+    .alpha-nav {
+        justify-content: space-around;
+        padding: var(--spacing-xs);
+    }
+
+    .alpha-nav a {
+        padding: 3px 6px;
+        margin: 2px;
+    }
+
+    .search-bar {
+        flex-direction: column;
+    }
+
+    .search-bar input[type="text"] {
+        border-radius: 5px;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .search-bar button {
+        border-radius: 5px;
+        width: 100%;
+    }
+}
+/* --- General CSS Rules (from style.css) applied to single-term.html --- */
+
+/* Colors, Fonts, and Spacing Variables */
+:root {
+    --primary-blue: #2c3e50;
+    /* Dark Blue */
+    --secondary-blue: #34495e;
+    /* Slightly lighter dark blue */
+    --accent-gold: #c09f77;
+    /* Muted Gold/Bronze */
+    --text-dark: #333;
+    --text-light: #f4f4f4;
+    --background-light: #fdfdfd;
+    --border-light: #e0e0e0;
+    --hover-light: #f0f0f0;
+
+    --font-heading: 'Merriweather', serif;
+    --font-body: 'Open Sans', sans-serif;
+
+    --spacing-xs: 8px;
+    --spacing-sm: 16px;
+    --spacing-md: 24px;
+    --spacing-lg: 48px;
+}
+
+/* Body and Global Text Styles */
+body {
+    font-family: var(--font-body);
+    /* Open Sans for readability */
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--background-light);
+    /* Off-white background */
+    margin: 0;
+    padding-top: 70px;
+    /* Space for fixed header */
+}
+
+/* Page Container (to center content and add padding) */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Centers the container */
+    padding: var(--spacing-md);
+    /* Adds space around content */
+}
+
+/* Header (for consistent navigation) */
+.header {
+    background-color: var(--primary-blue);
+    color: var(--text-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    /* Keeps header at top */
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header .logo {
+    font-family: var(--font-heading);
+    /* Merriweather for the logo */
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--accent-gold);
+    /* Gold accent for the logo */
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.header .nav-menu {
+    list-style: none;
+    display: flex;
+}
+
+.header .nav-menu a {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.header .nav-menu a:hover,
+.header .nav-menu a.active {
+    color: var(--accent-gold);
+    /* Gold on hover/active */
+}
+
+/* Page Headings (h1, h2, h3 for term, definition, etc.) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    /* Merriweather for headings */
+    margin-bottom: var(--spacing-sm);
+    color: var(--secondary-blue);
+    /* Dark blue for headings */
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: var(--spacing-md);
+}
+
+h2 {
+    font-size: 2em;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+/* Card Style (main content container for the term) */
+.card {
+    background-color: #fff;
+    /* White background */
+    border: 1px solid var(--border-light);
+    /* Subtle border */
+    border-radius: 8px;
+    /* Rounded corners */
+    padding: var(--spacing-md);
+    /* Internal padding */
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    /* Soft shadow for depth */
+}
+
+/* Specific styling for elements within the single term page */
+.pronunciation {
+    font-style: italic;
+    color: #666;
+    /* Slightly muted color for pronunciation */
+    margin-bottom: var(--spacing-sm);
+}
+
+.definition-section p,
+.details-section p,
+.usage-section ul,
+.usage-section li {
+    margin-bottom: var(--spacing-xs);
+    /* Consistent spacing for paragraphs and list items */
+    font-size: 1.05em;
+    /* Slightly larger text for main content */
+}
+
+.definition-section strong {
+    color: var(--primary-blue);
+    /* Emphasize the term in definition */
+}
+
+.related-terms-section ul {
+    list-style: disc;
+    /* Standard bullet points */
+    margin-left: var(--spacing-md);
+}
+
+.related-terms-section a {
+    color: var(--secondary-blue);
+    /* Link color for related terms */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.related-terms-section a:hover {
+    text-decoration: underline;
+    /* Underline on hover */
+    color: var(--accent-gold);
+}
+
+.meta-info {
+    font-size: 0.9em;
+    color: #777;
+    /* Lighter grey for meta info */
+    margin-top: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+    /* Separator line */
+    padding-top: var(--spacing-sm);
+}
+
+
+/* Footer (consistent across pages) */
+.footer {
+    background-color: var(--secondary-blue);
+    color: var(--text-light);
+    text-align: center;
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    font-size: 0.9em;
+}
+
+.footer .footer-links a {
+    color: var(--accent-gold);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer .footer-links a:hover {
+    color: var(--text-light);
+}
+
+/* --- Responsive Adjustments (also from style.css) --- */
+@media (max-width: 768px) {
+
+    /* Adjustments for smaller screens */
+    .container {
+        padding: var(--spacing-sm);
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.6em;
+    }
+
+    /* ... other responsive rules ... */
+}

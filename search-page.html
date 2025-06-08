@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Diplomatic Terms</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="header">
+        <a href="dictionary-main.html" class="logo">Diplomatic<span>Lexicon</span></a>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="dictionary-main.html">Home</a></li>
+                <li><a href="terms-list.html">Browse Terms</a></li>
+                <li><a href="search-page.html" class="active">Search</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Search the Diplomatic Lexicon</h1>
+
+        <form class="search-bar" action="search-results.html" method="get">
+            <input type="text" name="query" placeholder="e.g., 'Persona Non Grata', 'Protocol', 'Treaty'"
+                aria-label="Search diplomatic terms">
+            <button type="submit">Search</button>
+        </form>
+
+        <section class="advanced-search-options" style="margin-bottom: var(--spacing-md);">
+            <details
+                style="border: 1px solid var(--border-light); border-radius: 8px; padding: var(--spacing-sm); background-color: #fff;">
+                <summary style="font-weight: 600; cursor: pointer; color: var(--secondary-blue);">Advanced Search
+                    Options</summary>
+                <div style="padding-top: var(--spacing-sm);">
+                    <div style="margin-bottom: var(--spacing-xs);">
+                        <label for="category" style="display: block; margin-bottom: 5px;">Category:</label>
+                        <select id="category" name="category"
+                            style="width: 100%; padding: 8px; border: 1px solid var(--border-light); border-radius: 4px;">
+                            <option value="">All Categories</option>
+                            <option value="protocol">Protocol & Etiquette</option>
+                            <option value="law">International Law</option>
+                            <option value="relations">State Relations</option>
+                            <option value="roles">Diplomatic Roles</option>
+                            <!-- Add more categories -->
+                        </select>
+                    </div>
+                    <div style="margin-bottom: var(--spacing-xs);">
+                        <label for="language" style="display: block; margin-bottom: 5px;">Origin Language:</label>
+                        <select id="language" name="language"
+                            style="width: 100%; padding: 8px; border: 1px solid var(--border-light); border-radius: 4px;">
+                            <option value="">Any Language</option>
+                            <option value="latin">Latin</option>
+                            <option value="french">French</option>
+                            <option value="english">English</option>
+                        </select>
+                    </div>
+                    <div style="margin-top: var(--spacing-sm);">
+                        <input type="checkbox" id="exact-match" name="exact-match">
+                        <label for="exact-match">Exact phrase match</label>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <section class="search-results">
+            <h2>Recent Searches (Example Results)</h2>
+            <div class="card">
+                <h3><a href="single-term.html?term=Persona_Non_Grata"
+                        style="color: var(--secondary-blue); text-decoration: none;">Persona Non Grata</a></h3>
+                <p>Status applied by a host country to a foreign diplomat or other foreign national, signifying that the
+                    person is no longer acceptable and must leave the country. Under Article 9 of the 1961 Vienna
+                    Convention...</p>
+                <p style="font-size: 0.9em; color: #777;"><em>Category: International Law, State Relations</em></p>
+            </div>
+            <div class="card">
+                <h3><a href="single-term.html?term=Diplomatic_Immunity"
+                        style="color: var(--secondary-blue); text-decoration: none;">Diplomatic Immunity</a></h3>
+                <p>A form of legal immunity that ensures diplomats are safe from prosecution under the laws of the host
+                    country. It is established by international law, specifically the Vienna Convention on Diplomatic
+                    Relations...</p>
+                <p style="font-size: 0.9em; color: #777;"><em>Category: International Law, Diplomatic Privileges</em>
+                </p>
+            </div>
+            <div class="card">
+                <h3><a href="single-term.html?term=Treaty"
+                        style="color: var(--secondary-blue); text-decoration: none;">Treaty</a></h3>
+                <p>A formal, legally binding written agreement between international law subjects (typically sovereign
+                    states and international organizations). Treaties are typically negotiated, signed, and ratified by
+                    states...</p>
+                <p style="font-size: 0.9em; color: #777;"><em>Category: International Law, Agreements</em></p>
+            </div>
+            <div class="card">
+                <h3><a href="single-term.html?term=Protocol"
+                        style="color: var(--secondary-blue); text-decoration: none;">Protocol</a></h3>
+                <p>In diplomatic terms, 'protocol' refers to the established system of rules and etiquette governing
+                    international relations and diplomatic functions. It ensures smooth and respectful interactions
+                    between states and their representatives...</p>
+                <p style="font-size: 0.9em; color: #777;"><em>Category: Protocol & Etiquette</em></p>
+            </div>
+
+            <div class="pagination" style="text-align: center; margin-top: var(--spacing-md);">
+                <a href="#" style="margin: 0 5px; text-decoration: none; color: var(--secondary-blue);">Previous</a>
+                <span style="margin: 0 5px; font-weight: bold;">1</span>
+                <a href="#" style="margin: 0 5px; text-decoration: none; color: var(--secondary-blue);">2</a>
+                <a href="#" style="margin: 0 5px; text-decoration: none; color: var(--secondary-blue);">3</a>
+                <span style="margin: 0 5px;">...</span>
+                <a href="#" style="margin: 0 5px; text-decoration: none; color: var(--secondary-blue);">10</a>
+                <a href="#" style="margin: 0 5px; text-decoration: none; color: var(--secondary-blue);">Next</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Sitemap</a></li>
+        </ul>
+        <p>© 2023 DiplomaticLexicon. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>
