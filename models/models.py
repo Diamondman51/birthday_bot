@@ -35,9 +35,7 @@ class Birthdays(Base):
     birthday_boy_id: Mapped[int] = mapped_column(Integer, unique=False, nullable=True)
     date: Mapped[datetime] = mapped_column(DateTime)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    group_id: Mapped[int] = mapped_column(ForeignKey('groups.id'), nullable=True)
     user: Mapped[User] = relationship(back_populates='birthdays')
-    group: Mapped['Groups'] = relationship(back_populates='birthdays')
     lang: Mapped['Langs'] = mapped_column(SQEnum(Langs), nullable=True)
     desc: Mapped[str] = mapped_column(String(255), nullable=True)
 
@@ -51,7 +49,5 @@ class Groups(Base):
     name: Mapped[str] = mapped_column(String, unique=False, nullable=True)
     group_id: Mapped[int] = mapped_column(Integer, unique=False, nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-
-    birthdays: Mapped[list[Birthdays]] = relationship(back_populates='group')
     user: Mapped[User] = relationship(back_populates='groups')
     

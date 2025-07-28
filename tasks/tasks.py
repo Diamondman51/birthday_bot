@@ -1,9 +1,15 @@
 import asyncio
+from functools import wraps
+import logging
 from aiogram import Bot
 from celery import Celery
 from redis import Redis
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.queues import MyQueue
+from models.models import User
+from sqlalchemy.ext.asyncio import AsyncSession
 
 queue = MyQueue()
 
@@ -19,6 +25,7 @@ app = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localh
 
 cache = Redis(host='localhost', port=6379, db=1)
 cache.flushall()
+logger = logging.getLogger(__name__)
 
 
 @app.task
@@ -37,6 +44,39 @@ async def send_async_notification(user_id: int, text: str, imeninnik_id: int, is
     await bot.session.close()
     print(f'from task: {queue._instance}')
     queue.put({'user_id': user_id, 'imeninnik_id': imeninnik_id, 'is_notif': is_notif}, name=user_id)
+
+
+def get_connection(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        async with Session.begin() as session:
+            # if kwargs.get('session', None):
+            kwargs['session'] = session
+            return await func(*args, **kwargs)
+    return wrapper
+
+async def get_user(user_id: int, session: AsyncSession) -> User:
+    q = select(User).options(selectinload(User.birthdays)).where(User.id == user_id)
+    res = await session.execute(q)
+    user: User = res.scalar()
+    logger.info('Success')
+    return user
+
+
+async def send_to_groups(user_id, imeninnik_id):
+    user: User = get_user(user_id=user_id)
+    group_ids: list[int] = [group.id for group in user.groups]
+    for id in group_ids:
+        res = await bot.get_chat_member(id, imeninnik_id) # TODO
+
+
+# async def get_user(user_id: int) -> User:
+#     async with Session.begin() as session:
+#         q = select(User).options(selectinload(User.birthdays)).where(User.id == user_id)
+#         res = await session.execute(q)
+#         user: User = res.scalar()
+#         return user
+
 
 
 
