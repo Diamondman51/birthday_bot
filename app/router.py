@@ -25,6 +25,7 @@ def setup():
     router.callback_query.register(pagination_handler, Pagination.filter())
     router.callback_query.register(edit_name, Edit.filter(F.action == 'edit_name'))
     router.message.register(get_edited_name, EditState.name)
+    router.message.register(get_edited_birth_time, EditState.time_)
     router.callback_query.register(delete_birth, Edit.filter(F.action == 'delete'))
     router.callback_query.register(edit_birth, Edit.filter(F.action == 'edit_birth'))
     router.message.register(get_edited_birth, EditState.birth)

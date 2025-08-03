@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import logging
+import os
 import queue
 from typing import Union
 from aiogram import Bot
@@ -9,7 +10,7 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from pydantic_core import ValidationError
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy import select, insert, exists, delete
+from sqlalchemy import between, select, insert, exists, delete
 from aiogram.fsm.context import FSMContext
 from buttons.buttons import BirthdayCallback, Edit, Pagination, edit, get_username_id, paginator, set_notif_date, start as start_buttons, universal_keyboard, lang_data
 
@@ -20,16 +21,23 @@ from app.states import BirthdayState, EditState
 from schemas.schema import LangSchema, TimeSchema
 from tasks.tasks import send_notification
 from app.queues import MyQueue
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 bot = Bot(token=config.BOT_TOKEN)
 
-engine = create_async_engine("sqlite+aiosqlite:///bot.db")
+engine = create_async_engine(os.getenv('db_url'))
 
 Session = async_sessionmaker(engine, expire_on_commit=False)
 
-cache = Redis(host='localhost', port=6379, db=1)
+cache = Redis(host=os.getenv('redis_url'), port=6379, db=1)
+
+prompt_with_username = 'Пожалуйста напиши только один образец поздравления на день рождение {} от имени @{}, не менее на 100 слов, не забудь добавить собачку перед именем поздравителя, пусть в ответе будет только само поздравление без никаких дополнительных ответов. Язык{}. Он мне {}'
+
+prompt_without_username = 'Пожалуйста напиши только один образец поздравления на день рождение {} от имени {}, не менее на 100 слов, пусть в ответе будет только само поздравление без никаких дополнительных ответов. Язык{}. Он мне {}'
 
 
 async def start(message: Message):
@@ -46,8 +54,11 @@ async def start(message: Message):
         user = select(exists().where(User.username == username).__or__(exists().where(User.id == user_id)))
         user = await conn.execute(user)
         user = user.scalar()
+        logger.info(f'User exists: {user}')
         if not user:
+            logger.info(f'Saving user')
             user = insert(User).values(id=user_id, username=username, full_name=fullname)
+            await conn.execute(user)
             await conn.commit()
 
 
@@ -188,12 +199,12 @@ async def create_birthday(message: Message, data: dict, state: FSMContext):
         date=date,
         desc=desc,
         lang=lang).returning(
-            Birthdays.date, Birthdays.birthday_boy_id, Birthdays.birthday_boy_username, Birthdays.full_name, Birthdays.user_id, Birthdays.notification_time, Birthdays.id)
+            Birthdays.date, Birthdays.birthday_boy_id, Birthdays.birthday_boy_username, Birthdays.full_name, Birthdays.user_id, Birthdays.notification_time, Birthdays.id, Birthdays.lang, Birthdays.desc)
     async with Session() as conn:
         res = await conn.execute(birth)
         await conn.commit()
         n_obj: Birthdays = res.fetchone()
-        logger.info(f'{n_obj=}', n_obj.date)
+        logger.info(f'{n_obj=} {n_obj.date}')
         try:
             await state.clear()
             await conn.commit()
@@ -213,9 +224,9 @@ async def congratulate(message: Union[Message, int], imeninnik : Birthdays, bot:
     if isinstance(message, Message):
         user = message.from_user.username if message.from_user.username else message.from_user.first_name
         if message.from_user.username is not None:
-            text = generate(f'Пожалуйста напиши только один образец поздравления на день рождение {imeninnik_name} от имени @{user}, не менее на 100 слов, не забудь добавить собачку перед именем поздравителя, пусть в ответе будет только само поздравление без никаких дополнительных ответов')
+            text = generate(prompt_with_username.format(imeninnik_name, user, imeninnik.lang, imeninnik.desc))
         else:
-            text = generate(f'Пожалуйста напиши только один образец поздравления на день рождение {imeninnik_name} от имени {user}, не менее на 100 слов, пусть в ответе будет только само поздравление без никаких дополнительных ответов')
+            text = generate(prompt_without_username.format(imeninnik_name, user, imeninnik.lang, imeninnik.desc))
     else:
         async with Session() as conn:
             try:
@@ -223,9 +234,9 @@ async def congratulate(message: Union[Message, int], imeninnik : Birthdays, bot:
                 res: User = await conn.scalar(q)
                 user = res.username if res.username else res.full_name
                 if res.username is not None:
-                    text = generate(f'Пожалуйста напиши только один образец поздравления на день рождение {imeninnik_name} от имени @{user}, не менее на 100 слов, не забудь добавить собачку перед именем поздравителя, пусть в ответе будет только само поздравление без никаких дополнительных ответов')
+                    text = generate(prompt_with_username.format(imeninnik_name, user, imeninnik.lang, imeninnik.desc))
                 else:
-                    text = generate(f'Пожалуйста напиши только один образец поздравления на день рождение {imeninnik_name} от имени {user}, не менее на 100 слов, пусть в ответе будет только само поздравление без никаких дополнительных ответов')
+                    text = generate(prompt_without_username.format(imeninnik_name, user, imeninnik.lang, imeninnik.desc))
             except Exception as e:
                 res = select(User).where(User.username == 'Diamondman51')
                 admin: User = await conn.scalar(res)
@@ -236,11 +247,11 @@ async def congratulate(message: Union[Message, int], imeninnik : Birthdays, bot:
     logger.info(f'Congratulate {today < birth_date=}')
     if today < birth_date:
         send_notification.apply_async(args=(message.from_user.id if isinstance(message, Message) else message, text, imeninnik.birthday_boy_id, False), countdown=(birth_date-today).total_seconds())
-        logger.info(f'{text=}', (birth_date-today).total_seconds())
+        logger.info(f'{text=} {(birth_date-today).total_seconds()}')
     else:
         birth_date = imeninnik.date.replace(year=today.year + 1)
         send_notification.apply_async(args=(message.from_user.id if isinstance(message, Message) else message, text, imeninnik.birthday_boy_id, False), countdown=(birth_date-today).total_seconds())
-        logger.info('Congrat changed to one year forward', (birth_date-today).total_seconds())
+        logger.info(f'Congrat changed to one year forward {(birth_date-today).total_seconds()}')
 
 
 async def cancel(callback: CallbackQuery, state: FSMContext):
@@ -303,9 +314,12 @@ async def set_sending_time(notif_date: datetime.datetime, user_id: int, imeninni
         birthday = birthday.replace(year=notif_date.year)
         flag = True
         while flag:
-            if birthday < notif_date:
-                birthday = birthday.replace(year=birthday.year)
+            session = Session()
+            if birthday < today:
+                birthday = birthday.replace(year=birthday.year + 1)
                 logger.info('changed')
+                await session.commit()
+                await session.close()
             else:
                 flag = False
                 logger.info(f'{flag=}')
@@ -315,7 +329,7 @@ async def set_sending_time(notif_date: datetime.datetime, user_id: int, imeninni
 
         text = f'День рождение {imeninnik.full_name} через {(birthday - notif_date).days} дней \n{(birthday - notif_date).seconds // 3600} часов\n{(birthday - notif_date).seconds % 3600 // 60} минут'
     logger.info(text)
-    res = send_notification.apply_async(args=(user_id, text, imeninnik.id), countdown=between.total_seconds())
+    res = send_notification.apply_async(args=(user_id, text, imeninnik.birthday_boy_id), countdown=between.total_seconds())
     logger.info(f"{res.id=}")
     logger.info(f"Until: {between.total_seconds() // (3600*24)=}")
     logger.info(f"Until: {between.total_seconds()=}")
@@ -378,15 +392,33 @@ async def edit_birth(call: CallbackQuery, callback_data: Edit, state: FSMContext
 
 
 async def get_edited_birth(message: Message, state: FSMContext, bot: Bot):
+    await state.update_data(birth=datetime.datetime.strptime(message.text, '%d.%m.%Y'))
+    await message.answer(f'Введите время поздравления. Формат: <b>ЧЧ:ММ</b> \nПримеры:\n\n<b>07:10\n22:50</b>', reply_markup=ReplyKeyboardRemove())
+    await state.set_state(EditState.time_)
+
+
+
+async def get_edited_birth_time(message: Message, state: FSMContext, bot: Bot):
+    try:
+        time_ = TimeSchema(time__=message.text)
+        await state.update_data(time_=time_.time__)
+    except ValidationError:
+        await state.set_state(BirthdayState.time__)
+        await message.answer(f'Время введено неправильно. Введите время в указанно формате: <b>ЧЧ:ММ</b>')
+        return
+    
     async with Session() as conn:
         try:
             data = await state.get_data()
             user_id = data.get('user_id')
+            time_ = data.get('time_')
+            birth_time = data.get('birth')
             res = select(Birthdays).where(Birthdays.birthday_boy_id == int(user_id), Birthdays.user_id == message.from_user.id)
             birth: Birthdays = await conn.scalar(res)
-            birth.date = datetime.datetime.strptime(message.text, '%d.%m.%Y')
+            birth.date = datetime.datetime.strptime(f'{birth_time} {time_}', '%d.%m.%Y %H:%M')
             await conn.commit()
             await message.answer('Успешно изменено')
+            await congratulate(message=message, imeninnik=birth, bot=bot)
             await show_birthdays(message)
             
         except Exception as e:
@@ -414,6 +446,7 @@ async def get_edited_notif(message: Message, state: FSMContext, bot: Bot):
             birth.notification_time = datetime.datetime.strptime(message.text, '%d.%m %H:%M')
             await conn.commit()
             await message.answer('Успешно изменено')
+            await set_sending_time(user_id=user_id, notif_date=birth.notification_time, imeninnik=birth)
             await show_birthdays(message)
 
         except Exception as e:
@@ -441,14 +474,10 @@ async def get_queue(client_id):
                         birth: Birthdays = await conn.scalar(query)
                         if is_notif:
                             birth.notification_time = birth.notification_time.replace(year=year.year + 1)
-                        else:
-                            birth.date = birth.date.replace(year=year.year + 1)
-                        await conn.commit()
-                        if is_notif:
                             await set_sending_time(birth.notification_time, user_id, birth)
                         else:
                             await congratulate(client_id, birth)
-                            pass # TODO call func for date
+                        await conn.commit()
                         logger.info('reset')
                     except Exception as e:
                         await conn.rollback()

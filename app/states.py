@@ -19,6 +19,7 @@ class EditState(StatesGroup):
     name = State()
     birth = State()
     notif = State()
+    time_ = State()
 
 
 class AddGroupState(StatesGroup):

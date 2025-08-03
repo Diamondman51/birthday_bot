@@ -19,7 +19,8 @@ dependencies = [
     "celery (>=5.5.3,<6.0.0)",
     "redis (>=6.2.0,<7.0.0)",
     "alembic (>=1.16.4,<2.0.0)",
-    "betterlogging (>=1.0.0,<2.0.0)"
+    "betterlogging (>=1.0.0,<2.0.0)",
+    "plyer (>=2.1.0,<3.0.0)"
 ]
 
 [build-system]

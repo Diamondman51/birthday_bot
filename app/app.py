@@ -39,7 +39,7 @@ bot = Bot(
 
 HOOK = '/hook/'
 # URL = input('Enter ngrok url: ')
-URL = 'https://ten-flowers-deny.loca.lt'
+URL = 'https://tiny-chairs-write.loca.lt'
 HOOK_URL = f'{URL}{HOOK}'
 # HOOK_URL = f'https://318c-104-154-169-9.ngrok-free.app/bot{HOOK}'
 

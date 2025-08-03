@@ -22,26 +22,32 @@ def get_connection(func):
             return await func(*args, **kwargs)
     return wrapper
 
+
 @get_connection
 async def get_user(user_id: int, session: AsyncSession) -> User:
-    q = select(User).options(selectinload(User.birthdays)).where(User.id == user_id)
+    q = select(User).options(selectinload(User.birthdays), selectinload(User.groups)).where(User.id == user_id)
     res = await session.execute(q)
     user: User = res.scalar()
     logger.info('Success')
     return user
 
 
+async def user_has_group(group_id, user: User) -> bool:
+    user_groups = [group.group_id for group in user.groups]
+    return group_id in user_groups
+
+
 async def get_group_id(message: Message, state: FSMContext, bot: Bot):
     try:
         chat = await bot.get_chat(message.chat_shared.chat_id)
+        # await bot.send_message(-1002795984024, 'hello')
         logger.info(chat.title)
-        user: User = await get_user(message.from_user.id)
+        user: User = await get_user(user_id=message.from_user.id)
         name = chat.title
         group_id = chat.id
-        q = select(exists().where(Groups.group_id == group_id))
-        # user.groups.append(group)
         session = Session()
-        res = await session.execute(q)
+
+        res = await user_has_group(group_id=group_id, user=user)
         if not res:
             group = Groups(name=name, group_id=group_id, user=user)
             session.add(group)
@@ -52,8 +58,12 @@ async def get_group_id(message: Message, state: FSMContext, bot: Bot):
             return
         await message.answer(f'''
         {user=}\n{group_id=}\n{name=}\n''')
-    except TelegramBadRequest:
-        await message.answer(f'Сначала <b>добавьте бота</b> в выбранную группу, затем попробуйте снова.')    
+    except TelegramBadRequest as e:
+        match e.message:
+            case 'Bad Request: chat not found':
+                await message.answer(f'Сначала <b>добавьте бота</b> в выбранную группу, затем попробуйте снова. Error: {e.message}')    
+            case 'Bad Request: member not found':
+                pass
     except Exception as e:
         await message.answer('Internal error')
         logger.error(f'{e}')
