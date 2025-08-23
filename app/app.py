@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import os
 from fastapi import FastAPI, Request
 from aiogram.types import Update
 from aiogram import Bot, Dispatcher
@@ -8,6 +9,9 @@ from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
 import config.config as config
 import app.router as router
+from dotenv import load_dotenv
+
+load_dotenv()
 
 PORT = 8000
 
@@ -39,7 +43,7 @@ bot = Bot(
 
 HOOK = '/hook/'
 # URL = input('Enter ngrok url: ')
-URL = 'https://tiny-chairs-write.loca.lt'
+URL = os.getenv('url')
 HOOK_URL = f'{URL}{HOOK}'
 # HOOK_URL = f'https://318c-104-154-169-9.ngrok-free.app/bot{HOOK}'
 

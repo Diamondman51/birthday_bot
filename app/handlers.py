@@ -15,11 +15,11 @@ from aiogram.fsm.context import FSMContext
 from buttons.buttons import BirthdayCallback, Edit, Pagination, edit, get_username_id, paginator, set_notif_date, start as start_buttons, universal_keyboard, lang_data
 
 from config import config
-from models.models import Birthdays, User
+from models.models import Birthdays, Groups, User
 from app.query import generate
 from app.states import BirthdayState, EditState
 from schemas.schema import LangSchema, TimeSchema
-from tasks.tasks import send_notification
+from tasks.tasks import get_user, send_notification
 from app.queues import MyQueue
 from dotenv import load_dotenv
 
@@ -283,6 +283,11 @@ async def show_birthdays(message: Message):
 async def pagination_handler(call: CallbackQuery, callback_data: Pagination):
     page = callback_data.page  # Получение номера страницы из callback data
     async with Session() as session:
+        if callback_data.is_group:
+            user: User = await get_user(user_id=call.message.from_user.id, session=session)
+            groups: Groups = user.groups
+            await call.message.edit_reply_markup(reply_markup=await paginator(session=session, page=page, user_id=call.from_user.id, data_seq=groups))  # Обновление клавиатуры при нажатии кнопок "вперед" или "назад"
+
         await call.message.edit_reply_markup(reply_markup=await paginator(session=session, page=page, user_id=call.from_user.id))  # Обновление клавиатуры при нажатии кнопок "вперед" или "назад"
 
 
@@ -404,7 +409,7 @@ async def get_edited_birth_time(message: Message, state: FSMContext, bot: Bot):
         await state.update_data(time_=time_.time__)
     except ValidationError:
         await state.set_state(BirthdayState.time__)
-        await message.answer(f'Время введено неправильно. Введите время в указанно формате: <b>ЧЧ:ММ</b>')
+        await message.answer(f'Время введено неправильно. Введите время в указанном формате: <b>ЧЧ:ММ</b>')
         return
     
     async with Session() as conn:

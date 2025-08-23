@@ -1,29 +1,7 @@
 [project]
 name = "birthday-bot"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "Diamondman51",email = "zshavkatov51@gmail.com"}
-]
+description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "sqlalchemy (>=2.0.41,<3.0.0)",
-    "aiogram (>=3.21.0,<4.0.0)",
-    "fastapi (>=0.116.1,<0.117.0)",
-    "uvicorn (>=0.35.0,<0.36.0)",
-    "aiosqlite (>=0.21.0,<0.22.0)",
-    "asyncpg (>=0.30.0,<0.31.0)",
-    "google-genai (>=1.27.0,<2.0.0)",
-    "python-dotenv (>=1.1.1,<2.0.0)",
-    "celery (>=5.5.3,<6.0.0)",
-    "redis (>=6.2.0,<7.0.0)",
-    "alembic (>=1.16.4,<2.0.0)",
-    "betterlogging (>=1.0.0,<2.0.0)",
-    "plyer (>=2.1.0,<3.0.0)"
-]
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-package-mode = false 
-build-backend = "poetry.core.masonry.api"
+dependencies = []

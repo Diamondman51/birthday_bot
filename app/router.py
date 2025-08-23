@@ -2,7 +2,8 @@ from aiogram import F, Router
 from aiogram.filters import CommandStart
 
 from app.handlers import *
-from handlers.group_handlers import get_group_id
+from buttons.buttons import EditGroupCallBack, GroupCallBack
+from handlers.group_handlers import get_group_callback, get_group_id, group_edit_action, show_groups
 
 def setup():
     router = Router()
@@ -31,5 +32,8 @@ def setup():
     router.message.register(get_edited_birth, EditState.birth)
     router.callback_query.register(edit_notif, Edit.filter(F.action == 'edit_notif'))
     router.message.register(get_edited_notif, EditState.notif)
+    router.message.register(show_groups, F.text == 'Показать группы')
+    router.callback_query.register(get_group_callback, GroupCallBack.filter())
+    router.callback_query.register(group_edit_action, EditGroupCallBack.filter())
 
     return router
